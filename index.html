@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f4f1ea" />
+  <meta name="description" content="Toolisto transforma, optimiza y prepara imágenes directamente en tu navegador. Sin registro y sin subir archivos a servidores." />
+  <title>Toolisto — Tus archivos, listos</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Toolisto, inicio">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M6 7h20M16 7v18M9 18l5 5 10-12" />
+      </svg>
+      <span>toolisto<span class="brand-dot">.</span></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a href="#herramientas">Herramientas</a>
+      <a href="#privacidad">Privacidad</a>
+      <a href="#acerca">Acerca</a>
+    </nav>
+
+    <button class="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <main id="inicio">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-type" aria-hidden="true">
+        <span>TOO</span>
+        <span>LIS</span>
+        <span>TO</span>
+      </div>
+
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> Herramientas sin complicaciones</p>
+        <h1 id="hero-title">Tus archivos,<br><em>listos</em> en segundos.</h1>
+        <p class="hero-description">Suelta una imagen y Toolisto reconoce lo que necesitas. Sin formularios eternos, sin registro y sin enviar tu archivo a ningún servidor.</p>
+        <div class="hero-trust">
+          <span>100% en tu navegador</span>
+          <span>Gratis para empezar</span>
+        </div>
+      </div>
+
+      <div class="workspace-shell">
+        <div class="workspace-topbar">
+          <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <span>toolisto / hacer</span>
+          <span class="secure-pill">Privado</span>
+        </div>
+
+        <div class="workspace" id="workspace">
+          <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden />
+
+          <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-controls="file-input">
+            <div class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48">
+                <path d="M24 31V11m0 0-8 8m8-8 8 8M10 29v7a4 4 0 0 0 4 4h20a4 4 0 0 0 4-4v-7" />
+              </svg>
+            </div>
+            <p class="drop-title">Arrastra una imagen aquí</p>
+            <p class="drop-subtitle">o elígela desde tu equipo</p>
+            <button class="choose-button" type="button" id="choose-file">Elegir archivo</button>
+            <p class="file-hint">JPG, PNG, WebP, GIF o SVG · hasta 25 MB</p>
+          </div>
+
+          <div class="file-panel" id="file-panel" hidden>
+            <div class="file-preview-wrap">
+              <img id="file-preview" alt="Vista previa del archivo seleccionado" />
+              <button class="remove-file" id="remove-file" type="button" aria-label="Quitar archivo">×</button>
+            </div>
+            <div class="file-info">
+              <p id="file-name">archivo.jpg</p>
+              <span id="file-meta">1200 × 800 · 1.2 MB</span>
+            </div>
+            <span class="detected-badge" id="detected-badge">Imagen detectada</span>
+          </div>
+
+          <div class="action-area" id="action-area" hidden>
+            <div class="action-heading">
+              <div>
+                <span class="mini-label">Toolisto recomienda</span>
+                <h2 id="action-title">Optimizar imagen</h2>
+              </div>
+              <span class="auto-badge">Automático</span>
+            </div>
+
+            <div class="action-tabs" role="tablist" aria-label="Acción para la imagen">
+              <button class="action-tab active" type="button" data-action="optimize">Comprimir</button>
+              <button class="action-tab" type="button" data-action="convert">Convertir</button>
+              <button class="action-tab" type="button" data-action="resize">Redimensionar</button>
+              <button class="action-tab" type="button" data-action="signature">Limpiar firma</button>
+            </div>
+
+            <details class="details-panel" id="details-panel">
+              <summary>Ajustar detalles <span>+</span></summary>
+              <div class="details-content">
+                <label class="field">
+                  <span>Formato final</span>
+                  <select id="format-select">
+                    <option value="image/webp">WebP</option>
+                    <option value="image/jpeg">JPG</option>
+                    <option value="image/png">PNG</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Calidad <output id="quality-output">82%</output></span>
+                  <input id="quality-range" type="range" min="45" max="100" value="82" />
+                </label>
+                <label class="field">
+                  <span>Ancho máximo</span>
+                  <input id="width-input" type="number" min="120" max="8000" step="10" placeholder="Original" />
+                </label>
+                <label class="field threshold-field" hidden>
+                  <span>Sensibilidad <output id="threshold-output">72%</output></span>
+                  <input id="threshold-range" type="range" min="20" max="95" value="72" />
+                </label>
+              </div>
+            </details>
+
+            <button class="primary-action" id="process-button" type="button">
+              <span>Hacerlo ahora</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+            </button>
+            <p class="status-message" id="status-message" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+
+      <a class="scroll-cue" href="#herramientas" aria-label="Ver herramientas">
+        <span>Descubre</span>
+        <i></i>
+      </a>
+    </section>
+
+    <section class="ticker" aria-label="Características">
+      <div class="ticker-track">
+        <span>Sin registro</span><i>✦</i><span>Procesamiento local</span><i>✦</i><span>Rápido y ligero</span><i>✦</i><span>Tu archivo no sale de tu equipo</span><i>✦</i>
+        <span>Sin registro</span><i>✦</i><span>Procesamiento local</span><i>✦</i><span>Rápido y ligero</span><i>✦</i><span>Tu archivo no sale de tu equipo</span><i>✦</i>
+      </div>
+    </section>
+
+    <section class="tools-section" id="herramientas" aria-labelledby="tools-title">
+      <div class="section-intro">
+        <p class="eyebrow"><span></span> Lo esencial, bien hecho</p>
+        <h2 id="tools-title">Una página.<br>Cuatro tareas.</h2>
+        <p>Toolisto evita que tengas que abrir cinco sitios distintos para preparar una imagen sencilla.</p>
+      </div>
+
+      <div class="tool-grid">
+        <article class="tool-card tool-card-featured" data-jump-action="optimize">
+          <span class="tool-number">01</span>
+          <div class="tool-symbol compress-symbol" aria-hidden="true"><i></i><i></i><i></i></div>
+          <h3>Comprimir</h3>
+          <p>Reduce el peso manteniendo una calidad visual equilibrada.</p>
+          <button type="button">Usar herramienta <span>↗</span></button>
+        </article>
+
+        <article class="tool-card" data-jump-action="convert">
+          <span class="tool-number">02</span>
+          <div class="tool-symbol convert-symbol" aria-hidden="true"><span>JPG</span><span>WEBP</span></div>
+          <h3>Convertir</h3>
+          <p>Cambia entre JPG, PNG y WebP directamente en el navegador.</p>
+          <button type="button">Usar herramienta <span>↗</span></button>
+        </article>
+
+        <article class="tool-card" data-jump-action="resize">
+          <span class="tool-number">03</span>
+          <div class="tool-symbol resize-symbol" aria-hidden="true"><i></i></div>
+          <h3>Redimensionar</h3>
+          <p>Ajusta el ancho sin deformar ni perder la proporción original.</p>
+          <button type="button">Usar herramienta <span>↗</span></button>
+        </article>
+
+        <article class="tool-card tool-card-dark" data-jump-action="signature">
+          <span class="tool-number">04</span>
+          <div class="tool-symbol signature-symbol" aria-hidden="true">
+            <svg viewBox="0 0 120 64"><path d="M8 45c12-18 16-30 23-28 11 3-16 35-4 36 9 1 16-31 23-29 8 3-7 24-1 27 6 3 13-20 20-19 6 1-1 15 6 18 8 3 18-8 37-5" /></svg>
+          </div>
+          <h3>Limpiar firma</h3>
+          <p>Quita el fondo claro y deja la firma lista como PNG transparente.</p>
+          <button type="button">Usar herramienta <span>↗</span></button>
+        </article>
+      </div>
+    </section>
+
+    <section class="privacy-section" id="privacidad" aria-labelledby="privacy-title">
+      <div class="privacy-visual" aria-hidden="true">
+        <div class="privacy-ring ring-one"></div>
+        <div class="privacy-ring ring-two"></div>
+        <div class="privacy-core">
+          <svg viewBox="0 0 48 48"><path d="M15 21v-5a9 9 0 0 1 18 0v5M12 21h24v19H12zM24 29v4" /></svg>
+        </div>
+        <span class="orbit-label label-one">LOCAL</span>
+        <span class="orbit-label label-two">PRIVADO</span>
+      </div>
+      <div class="privacy-copy">
+        <p class="eyebrow light"><span></span> Privacidad de verdad</p>
+        <h2 id="privacy-title">Tu archivo entra.<br>Tu archivo <em>no sale.</em></h2>
+        <p>Las tareas se ejecutan dentro de tu navegador. Toolisto no necesita cuentas, contraseñas ni una copia de tu imagen en otro servidor.</p>
+        <div class="privacy-facts">
+          <div><strong>0</strong><span>archivos almacenados</span></div>
+          <div><strong>0</strong><span>cuentas requeridas</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section" id="acerca" aria-labelledby="about-title">
+      <p class="about-kicker">HECHO PARA LA VIDA REAL</p>
+      <h2 id="about-title">No necesitas saber de formatos.<br><span>Solo necesitas terminar.</span></h2>
+      <p>Toolisto detecta lo importante y deja los controles técnicos fuera del camino. Cuando necesites más precisión, están a un clic en “Ajustar detalles”.</p>
+      <a href="#inicio" class="text-link">Probar Toolisto ahora <span>↗</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand footer-brand" href="#inicio">toolisto<span>.</span></a>
+    <p>Herramientas simples para archivos cotidianos.</p>
+    <div class="footer-links">
+      <a href="#privacidad">Privacidad</a>
+      <a href="#acerca">Acerca</a>
+      <a href="mailto:hola@toolisto.app">Contacto</a>
+    </div>
+    <p class="copyright">© <span id="year"></span> Toolisto</p>
+  </footer>
+
+  <canvas id="processing-canvas" hidden></canvas>
+  <script src="app.js"></script>
+</body>
+</html>
