@@ -3,234 +3,1207 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f4f1ea" />
-  <meta name="description" content="Toolisto transforma, optimiza y prepara imágenes directamente en tu navegador. Sin registro y sin subir archivos a servidores." />
-  <title>Toolisto — Tus archivos, listos</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#101826" />
+  <meta name="description" content="Toolisto prepara tus imágenes automáticamente: comprime, convierte, redimensiona y limpia firmas sin subir archivos a servidores." />
+  <title>Toolisto — Tu imagen, lista</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23101826'/%3E%3Cpath d='M16 18h32M32 18v29M20 35l8 8 18-24' fill='none' stroke='%23c8f169' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --ink: #101826;
+      --ink-2: #283247;
+      --paper: #f5f1e8;
+      --paper-2: #ebe5da;
+      --white: #fffdf7;
+      --lime: #c8f169;
+      --lime-2: #a8d73e;
+      --coral: #ff7258;
+      --sky: #7dd8ff;
+      --line: rgba(16, 24, 38, .15);
+      --muted: rgba(16, 24, 38, .62);
+      --shadow: 0 30px 90px rgba(16, 24, 38, .18);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: .05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.75'/%3E%3C/svg%3E");
+    }
+
+    .site-header {
+      position: absolute;
+      inset: 0 0 auto;
+      z-index: 20;
+      height: 86px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 clamp(20px, 5vw, 76px);
+    }
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -.06em;
+    }
+    .brand-mark {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--ink);
+      box-shadow: 3px 3px 0 var(--lime);
+    }
+    .brand-mark svg { width: 19px; }
+    .brand-mark path { fill: none; stroke: var(--lime); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .brand b { color: var(--coral); }
+    .nav { display: flex; gap: 30px; font-size: 12px; font-weight: 750; }
+    .nav a { padding: 8px 0; border-bottom: 1px solid transparent; }
+    .nav a:hover { border-color: currentColor; }
+    .header-status {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .header-status i { width: 8px; height: 8px; border-radius: 50%; background: var(--lime-2); box-shadow: 0 0 0 4px rgba(168, 215, 62, .16); }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding: 124px clamp(20px, 6vw, 96px) 74px;
+      display: grid;
+      grid-template-columns: minmax(330px, .82fr) minmax(480px, 1.18fr);
+      align-items: center;
+      gap: clamp(48px, 7vw, 112px);
+      isolation: isolate;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(circle at 9% 19%, rgba(200, 241, 105, .37), transparent 26%),
+        radial-gradient(circle at 92% 85%, rgba(125, 216, 255, .24), transparent 25%),
+        linear-gradient(116deg, transparent 0 59%, #ded5c8 59% 100%);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 430px;
+      height: 430px;
+      right: -110px;
+      top: -120px;
+      border: 1px dashed rgba(16, 24, 38, .2);
+      border-radius: 50%;
+      z-index: -2;
+      animation: turn 28s linear infinite;
+    }
+    @keyframes turn { to { transform: rotate(360deg); } }
+
+    .hero-copy { max-width: 630px; position: relative; z-index: 2; }
+    .eyebrow {
+      margin: 0 0 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 2px; background: currentColor; }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(58px, 7.7vw, 126px);
+      line-height: .82;
+      letter-spacing: -.08em;
+      font-weight: 900;
+    }
+    .hero h1 span { display: block; }
+    .hero h1 em {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 400;
+      color: var(--coral);
+    }
+    .hero-lead {
+      max-width: 570px;
+      margin: 31px 0 0;
+      color: var(--ink-2);
+      font-size: clamp(17px, 1.55vw, 21px);
+      line-height: 1.62;
+    }
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+    .trust-row span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .52);
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .trust-row span::before { content: "✓"; color: #4d7817; }
+
+    .app-window {
+      width: min(100%, 710px);
+      justify-self: end;
+      border: 1px solid rgba(255, 255, 255, .72);
+      border-radius: 32px;
+      overflow: hidden;
+      background: rgba(255, 253, 247, .9);
+      backdrop-filter: blur(22px);
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 5;
+    }
+    .app-bar {
+      min-height: 59px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.32);
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .dots { display: flex; gap: 6px; }
+    .dots i { width: 8px; height: 8px; border: 1px solid rgba(16,24,38,.42); border-radius: 50%; }
+    .private-badge { justify-self: end; display: inline-flex; align-items: center; gap: 7px; }
+    .private-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--lime-2); }
+    .app-body { padding: 20px; min-height: 570px; }
+
+    .drop-zone {
+      min-height: 530px;
+      border: 1.5px dashed rgba(16, 24, 38, .31);
+      border-radius: 23px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 32px;
+      cursor: pointer;
+      background:
+        linear-gradient(145deg, rgba(200,241,105,.1), transparent 45%),
+        rgba(235,229,218,.55);
+      transition: transform .22s ease, border-color .22s ease, background .22s ease;
+    }
+    .drop-zone:hover, .drop-zone.dragging {
+      transform: translateY(-3px);
+      border-color: var(--ink);
+      background: rgba(200, 241, 105, .16);
+    }
+    .drop-zone:focus-visible { outline: 4px solid rgba(125,216,255,.4); outline-offset: 3px; }
+    .drop-inner { max-width: 390px; }
+    .upload-orbit {
+      width: 98px;
+      height: 98px;
+      margin: 0 auto 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      box-shadow: 9px 9px 0 var(--lime);
+      position: relative;
+    }
+    .upload-orbit::after {
+      content: "";
+      position: absolute;
+      inset: -14px;
+      border: 1px dashed rgba(16,24,38,.25);
+      border-radius: 50%;
+      animation: turn 18s linear infinite reverse;
+    }
+    .upload-orbit svg { width: 39px; }
+    .upload-orbit path { fill: none; stroke: var(--white); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .drop-zone h2 { margin: 0; font-size: clamp(24px, 3vw, 35px); line-height: 1.05; letter-spacing: -.05em; }
+    .drop-zone p { margin: 12px 0 21px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .choose-file {
+      border: 0;
+      border-radius: 999px;
+      background: var(--ink);
+      color: white;
+      padding: 14px 21px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--coral);
+    }
+    .paste-hint { display: block; margin-top: 18px; font-size: 10px; color: rgba(16,24,38,.48); text-transform: uppercase; letter-spacing: .12em; }
+
+    .editor { display: grid; gap: 14px; }
+    .file-strip {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+    }
+    .thumb { width: 76px; height: 76px; border-radius: 13px; overflow: hidden; background: var(--paper-2); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .file-copy { min-width: 0; }
+    .file-copy strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+    .file-copy span { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; }
+    .reset-button { width: 39px; height: 39px; border: 1px solid var(--line); border-radius: 50%; background: transparent; cursor: pointer; font-size: 20px; }
+
+    .smart-box {
+      padding: 18px;
+      border-radius: 20px;
+      color: white;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .smart-label { margin: 0 0 6px; color: var(--lime); font-size: 9px; font-weight: 850; letter-spacing: .15em; text-transform: uppercase; }
+    .smart-box h2 { margin: 0; font-size: 23px; letter-spacing: -.045em; }
+    .smart-box p:last-child { margin: 7px 0 0; color: rgba(255,255,255,.62); font-size: 11px; line-height: 1.45; }
+    .working-dot { flex: 0 0 auto; width: 46px; height: 46px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; display: grid; place-items: center; }
+    .working-dot::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 7px rgba(200,241,105,.12); }
+    .smart-box.processing .working-dot { border-top-color: var(--lime); animation: turn .8s linear infinite; }
+
+    .task-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(235,229,218,.62);
+    }
+    .task-tab {
+      min-height: 48px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 760;
+      transition: .2s ease;
+    }
+    .task-tab.active { background: var(--white); box-shadow: 0 5px 16px rgba(16,24,38,.09); }
+
+    .options {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.36);
+      overflow: hidden;
+    }
+    .options summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 17px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .options summary::-webkit-details-marker { display: none; }
+    .options summary span { transition: transform .2s; font-size: 19px; font-weight: 400; }
+    .options[open] summary span { transform: rotate(45deg); }
+    .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 16px; }
+    .field { display: grid; gap: 8px; font-size: 10px; font-weight: 750; color: var(--muted); }
+    .field > span { display: flex; justify-content: space-between; gap: 12px; }
+    .field select, .field input[type="number"] {
+      width: 100%;
+      min-height: 42px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--ink);
+      background: var(--white);
+    }
+    .field input[type="range"] { width: 100%; accent-color: var(--ink); }
+
+    .result-card {
+      display: grid;
+      grid-template-columns: 170px minmax(0,1fr);
+      gap: 15px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--white);
+      box-shadow: 0 14px 36px rgba(16,24,38,.08);
+    }
+    .result-preview {
+      height: 144px;
+      border-radius: 14px;
+      overflow: hidden;
+      background:
+        linear-gradient(45deg, #e8e8e8 25%, transparent 25%),
+        linear-gradient(-45deg, #e8e8e8 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #e8e8e8 75%),
+        linear-gradient(-45deg, transparent 75%, #e8e8e8 75%), #fff;
+      background-size: 18px 18px;
+      background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+    }
+    .result-preview img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .result-copy { display: flex; flex-direction: column; min-width: 0; }
+    .result-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .ready-label { color: #4d7817; font-size: 9px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+    .saving-pill { padding: 6px 9px; border-radius: 999px; background: rgba(200,241,105,.28); color: #4d7817; font-size: 10px; font-weight: 850; }
+    .result-copy h3 { margin: 11px 0 7px; font-size: 19px; letter-spacing: -.035em; }
+    .result-meta { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .result-actions { display: flex; gap: 8px; margin-top: auto; }
+    .download-button, .copy-button {
+      min-height: 42px;
+      border-radius: 11px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 850;
+    }
+    .download-button { flex: 1; border: 0; background: var(--ink); color: white; box-shadow: 3px 3px 0 var(--lime); }
+    .copy-button { width: 46px; border: 1px solid var(--line); background: var(--paper); }
+    .status { min-height: 16px; margin: 0; text-align: center; color: var(--muted); font-size: 10px; }
+
+    .marquee { overflow: hidden; color: white; background: var(--ink); border-block: 1px solid var(--ink); }
+    .marquee-track { width: max-content; display: flex; align-items: center; gap: 30px; padding: 15px 0; animation: slide 28s linear infinite; }
+    .marquee-track span { font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; white-space: nowrap; }
+    .marquee-track i { color: var(--lime); font-style: normal; }
+    @keyframes slide { to { transform: translateX(-50%); } }
+
+    .tools {
+      padding: clamp(88px, 12vw, 170px) clamp(20px, 6vw, 96px);
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: .75fr 1.25fr 1fr;
+      align-items: end;
+      gap: 44px;
+      margin-bottom: 58px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(48px, 6vw, 92px);
+      line-height: .93;
+      letter-spacing: -.07em;
+    }
+    .section-head > p:last-child { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.75; }
+    .tool-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    .tool-card {
+      min-height: 390px;
+      padding: 25px;
+      border: 1px solid var(--line);
+      border-radius: 25px;
+      background: rgba(255,253,247,.64);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .28s ease, box-shadow .28s ease;
+    }
+    .tool-card:hover { transform: translateY(-7px); box-shadow: 0 20px 50px rgba(16,24,38,.1); }
+    .tool-card:nth-child(1) { background: #e2f5ad; }
+    .tool-card:nth-child(4) { color: white; background: var(--ink); }
+    .tool-num { font-size: 9px; font-weight: 850; letter-spacing: .14em; opacity: .55; }
+    .tool-art { min-height: 150px; display: grid; place-items: center; margin: 15px 0; }
+    .compress-art { position: relative; }
+    .compress-art i { position: absolute; width: 75px; height: 94px; border: 1px solid currentColor; background: rgba(255,255,255,.28); }
+    .compress-art i:nth-child(1) { transform: translate(-30px,8px) rotate(-9deg); }
+    .compress-art i:nth-child(2) { transform: translate(27px,-7px) rotate(7deg); }
+    .compress-art i:nth-child(3) { width: 83px; height: 101px; background: var(--coral); transform: rotate(-1deg); }
+    .convert-art { display: flex; gap: 8px; }
+    .convert-art b { padding: 19px 13px; border: 1px solid var(--line); border-radius: 10px; background: white; font-size: 10px; box-shadow: 5px 5px 0 var(--sky); }
+    .convert-art b:last-child { transform: translateY(22px); }
+    .resize-art i { width: 118px; height: 86px; border: 1px solid currentColor; background: linear-gradient(135deg,var(--sky) 0 49%, transparent 50%); position: relative; }
+    .resize-art i::before, .resize-art i::after { content: ""; position: absolute; width: 17px; height: 17px; }
+    .resize-art i::before { left: -8px; top: -8px; border-left: 2px solid; border-top: 2px solid; }
+    .resize-art i::after { right: -8px; bottom: -8px; border-right: 2px solid; border-bottom: 2px solid; }
+    .signature-art svg { width: 145px; }
+    .signature-art path { fill: none; stroke: var(--lime); stroke-width: 3; stroke-linecap: round; }
+    .tool-card h3 { margin: 0 0 12px; font-size: 27px; letter-spacing: -.05em; }
+    .tool-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .tool-card:nth-child(4) p { color: rgba(255,255,255,.62); }
+    .tool-link { margin-top: auto; padding-top: 18px; border-top: 1px solid currentColor; display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; }
+
+    .privacy {
+      min-height: 740px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 80px;
+      padding: 96px clamp(20px, 8vw, 128px);
+      color: white;
+      background: var(--ink);
+      overflow: hidden;
+    }
+    .privacy-visual { min-height: 500px; display: grid; place-items: center; position: relative; }
+    .privacy-ring { position: absolute; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; }
+    .privacy-ring.one { width: 440px; height: 440px; }
+    .privacy-ring.two { width: 315px; height: 315px; border-style: dashed; animation: turn 25s linear infinite; }
+    .privacy-core { width: 165px; height: 165px; border-radius: 50%; background: var(--lime); display: grid; place-items: center; box-shadow: 0 0 100px rgba(200,241,105,.24); }
+    .privacy-core svg { width: 60px; }
+    .privacy-core path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .privacy-tag { position: absolute; padding: 7px 10px; border: 1px solid rgba(255,255,255,.28); border-radius: 999px; font-size: 8px; letter-spacing: .17em; }
+    .privacy-tag.local { top: 16%; right: 11%; }
+    .privacy-tag.zero { bottom: 17%; left: 8%; }
+    .privacy .eyebrow { color: var(--lime); }
+    .privacy h2 { margin: 0; font-size: clamp(49px, 5.6vw, 88px); line-height: .94; letter-spacing: -.07em; }
+    .privacy h2 em { font-family: Georgia,serif; font-weight: 400; color: var(--lime); }
+    .privacy-copy > p:last-of-type { max-width: 590px; color: rgba(255,255,255,.63); font-size: 17px; line-height: 1.75; }
+    .privacy-facts { display: flex; gap: 62px; margin-top: 40px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,.15); }
+    .privacy-facts div { display: grid; gap: 7px; }
+    .privacy-facts strong { font-size: 50px; color: var(--lime); line-height: 1; }
+    .privacy-facts span { color: rgba(255,255,255,.52); font-size: 11px; }
+
+    .closing { padding: clamp(110px,15vw,210px) 20px; text-align: center; }
+    .closing small { font-size: 9px; font-weight: 850; letter-spacing: .18em; }
+    .closing h2 { margin: 28px 0 0; font-size: clamp(46px,7vw,104px); line-height: .93; letter-spacing: -.075em; }
+    .closing h2 span { color: rgba(16,24,38,.23); }
+    .closing p { max-width: 690px; margin: 30px auto; color: var(--muted); font-size: 17px; line-height: 1.75; }
+    .closing a { display: inline-flex; gap: 14px; padding-bottom: 6px; border-bottom: 1px solid; font-size: 12px; font-weight: 850; }
+
+    .footer {
+      margin: 0 16px 16px;
+      padding: 38px;
+      border-radius: 25px;
+      background: #ded5c8;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr auto;
+      align-items: center;
+      gap: 30px;
+    }
+    .footer p { margin: 0; color: var(--muted); font-size: 12px; }
+    .footer-links { display: flex; gap: 22px; font-size: 11px; font-weight: 750; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      z-index: 120;
+      transform: translate(-50%, 140%);
+      padding: 12px 16px;
+      border-radius: 999px;
+      color: white;
+      background: var(--ink);
+      box-shadow: 0 15px 40px rgba(16,24,38,.25);
+      font-size: 11px;
+      font-weight: 750;
+      transition: transform .28s ease;
+    }
+    .toast.show { transform: translate(-50%, 0); }
+
+    @media (max-width: 1120px) {
+      .hero { grid-template-columns: 1fr 1fr; padding-inline: 38px; gap: 40px; }
+      .tool-grid { grid-template-columns: repeat(2,1fr); }
+      .section-head { grid-template-columns: 1fr 1.4fr; }
+      .section-head > p:last-child { grid-column: 2; }
+      .privacy { padding-inline: 46px; }
+    }
+    @media (max-width: 850px) {
+      .site-header { grid-template-columns: 1fr auto; height: 74px; padding-inline: 20px; }
+      .nav { display: none; }
+      .header-status { font-size: 9px; }
+      .hero { grid-template-columns: 1fr; gap: 52px; padding: 108px 20px 66px; }
+      .hero::before { background: radial-gradient(circle at 5% 12%, rgba(200,241,105,.36), transparent 29%), linear-gradient(180deg, transparent 0 46%, #ded5c8 46% 100%); }
+      .hero-copy { max-width: 720px; }
+      .app-window { justify-self: center; }
+      .section-head { display: block; }
+      .section-head h2 { margin-bottom: 24px; }
+      .privacy { grid-template-columns: 1fr; gap: 20px; padding: 80px 20px; }
+      .privacy-visual { min-height: 390px; order: 2; }
+      .privacy-ring.one { width: 340px; height: 340px; }
+      .privacy-ring.two { width: 245px; height: 245px; }
+      .footer { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 580px) {
+      .header-status span { display: none; }
+      .hero h1 { font-size: 62px; }
+      .app-body { padding: 11px; min-height: 520px; }
+      .app-bar { padding-inline: 13px; }
+      .drop-zone { min-height: 495px; padding: 25px 16px; }
+      .file-strip { grid-template-columns: 62px minmax(0,1fr) auto; }
+      .thumb { width: 62px; height: 62px; }
+      .smart-box { align-items: flex-start; }
+      .task-tabs { grid-template-columns: 1fr 1fr; }
+      .option-grid { grid-template-columns: 1fr; }
+      .result-card { grid-template-columns: 1fr; }
+      .result-preview { height: 210px; }
+      .result-actions { margin-top: 15px; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .tool-card { min-height: 360px; }
+      .tools { padding-inline: 15px; }
+      .privacy-visual { transform: scale(.9); margin: -18px; }
+      .privacy-facts { gap: 34px; }
+      .footer { grid-template-columns: 1fr; margin: 0 8px 8px; padding: 27px; }
+      .footer-links { flex-wrap: wrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *,*::before,*::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
   <header class="site-header">
     <a class="brand" href="#inicio" aria-label="Toolisto, inicio">
-      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M6 7h20M16 7v18M9 18l5 5 10-12" />
-      </svg>
-      <span>toolisto<span class="brand-dot">.</span></span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M6 7h20M16 7v18M9 18l5 5 10-12" /></svg>
+      </span>
+      <span>toolisto<b>.</b></span>
     </a>
-
-    <nav class="main-nav" aria-label="Navegación principal">
+    <nav class="nav" aria-label="Navegación principal">
       <a href="#herramientas">Herramientas</a>
       <a href="#privacidad">Privacidad</a>
       <a href="#acerca">Acerca</a>
     </nav>
-
-    <button class="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false">
-      <span></span><span></span>
-    </button>
+    <div class="header-status"><i></i><span>Funciona en tu navegador</span></div>
   </header>
 
   <main id="inicio">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-type" aria-hidden="true">
-        <span>TOO</span>
-        <span>LIS</span>
-        <span>TO</span>
-      </div>
-
+    <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow"><span></span> Herramientas sin complicaciones</p>
-        <h1 id="hero-title">Tus archivos,<br><em>listos</em> en segundos.</h1>
-        <p class="hero-description">Suelta una imagen y Toolisto reconoce lo que necesitas. Sin formularios eternos, sin registro y sin enviar tu archivo a ningún servidor.</p>
-        <div class="hero-trust">
-          <span>100% en tu navegador</span>
-          <span>Gratis para empezar</span>
+        <p class="eyebrow">Una sola página. Cero complicaciones.</p>
+        <h1><span>Tu imagen.</span><span><em>Lista.</em></span></h1>
+        <p class="hero-lead">Elige una imagen y Toolisto decide automáticamente cómo prepararla. Comprime, convierte, redimensiona o limpia una firma sin enviarla a ningún servidor.</p>
+        <div class="trust-row">
+          <span>Sin registro</span>
+          <span>Procesamiento local</span>
+          <span>Resultado automático</span>
         </div>
       </div>
 
-      <div class="workspace-shell">
-        <div class="workspace-topbar">
-          <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
-          <span>toolisto / hacer</span>
-          <span class="secure-pill">Privado</span>
+      <div class="app-window" aria-label="Aplicación Toolisto">
+        <div class="app-bar">
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <span>Toolisto / automático</span>
+          <span class="private-badge">Privado</span>
         </div>
+        <div class="app-body">
+          <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden />
 
-        <div class="workspace" id="workspace">
-          <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden />
-
-          <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-controls="file-input">
-            <div class="drop-icon" aria-hidden="true">
-              <svg viewBox="0 0 48 48">
-                <path d="M24 31V11m0 0-8 8m8-8 8 8M10 29v7a4 4 0 0 0 4 4h20a4 4 0 0 0 4-4v-7" />
-              </svg>
-            </div>
-            <p class="drop-title">Arrastra una imagen aquí</p>
-            <p class="drop-subtitle">o elígela desde tu equipo</p>
-            <button class="choose-button" type="button" id="choose-file">Elegir archivo</button>
-            <p class="file-hint">JPG, PNG, WebP, GIF o SVG · hasta 25 MB</p>
-          </div>
-
-          <div class="file-panel" id="file-panel" hidden>
-            <div class="file-preview-wrap">
-              <img id="file-preview" alt="Vista previa del archivo seleccionado" />
-              <button class="remove-file" id="remove-file" type="button" aria-label="Quitar archivo">×</button>
-            </div>
-            <div class="file-info">
-              <p id="file-name">archivo.jpg</p>
-              <span id="file-meta">1200 × 800 · 1.2 MB</span>
-            </div>
-            <span class="detected-badge" id="detected-badge">Imagen detectada</span>
-          </div>
-
-          <div class="action-area" id="action-area" hidden>
-            <div class="action-heading">
-              <div>
-                <span class="mini-label">Toolisto recomienda</span>
-                <h2 id="action-title">Optimizar imagen</h2>
+          <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-controls="fileInput">
+            <div class="drop-inner">
+              <div class="upload-orbit" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><path d="M24 31V10m0 0-8 8m8-8 8 8M9 29v8a4 4 0 0 0 4 4h22a4 4 0 0 0 4-4v-8" /></svg>
               </div>
-              <span class="auto-badge">Automático</span>
+              <h2>Suelta una imagen.<br>Toolisto hace el resto.</h2>
+              <p>JPG, PNG, WebP, GIF o SVG de hasta 25 MB.</p>
+              <button class="choose-file" id="chooseFile" type="button">Elegir imagen</button>
+              <span class="paste-hint">También puedes pegarla con Ctrl + V</span>
+            </div>
+          </div>
+
+          <section class="editor" id="editor" hidden aria-live="polite">
+            <div class="file-strip">
+              <div class="thumb"><img id="originalPreview" alt="Imagen original" /></div>
+              <div class="file-copy">
+                <strong id="fileName">imagen.jpg</strong>
+                <span id="fileMeta">1200 × 800 · 1.2 MB</span>
+              </div>
+              <button class="reset-button" id="resetButton" type="button" aria-label="Elegir otra imagen">×</button>
             </div>
 
-            <div class="action-tabs" role="tablist" aria-label="Acción para la imagen">
-              <button class="action-tab active" type="button" data-action="optimize">Comprimir</button>
-              <button class="action-tab" type="button" data-action="convert">Convertir</button>
-              <button class="action-tab" type="button" data-action="resize">Redimensionar</button>
-              <button class="action-tab" type="button" data-action="signature">Limpiar firma</button>
+            <div class="smart-box" id="smartBox">
+              <div>
+                <p class="smart-label">Recomendación inteligente</p>
+                <h2 id="smartTitle">Optimizando imagen</h2>
+                <p id="smartDescription">Ajustamos formato, tamaño y calidad automáticamente.</p>
+              </div>
+              <div class="working-dot" aria-hidden="true"></div>
             </div>
 
-            <details class="details-panel" id="details-panel">
-              <summary>Ajustar detalles <span>+</span></summary>
-              <div class="details-content">
+            <div class="task-tabs" role="tablist" aria-label="Tarea de imagen">
+              <button class="task-tab active" type="button" data-task="optimize">Comprimir</button>
+              <button class="task-tab" type="button" data-task="convert">Convertir</button>
+              <button class="task-tab" type="button" data-task="resize">Redimensionar</button>
+              <button class="task-tab" type="button" data-task="signature">Limpiar firma</button>
+            </div>
+
+            <details class="options" id="options">
+              <summary>Opciones avanzadas <span>+</span></summary>
+              <div class="option-grid">
                 <label class="field">
                   <span>Formato final</span>
-                  <select id="format-select">
+                  <select id="formatSelect">
                     <option value="image/webp">WebP</option>
                     <option value="image/jpeg">JPG</option>
                     <option value="image/png">PNG</option>
                   </select>
                 </label>
                 <label class="field">
-                  <span>Calidad <output id="quality-output">82%</output></span>
-                  <input id="quality-range" type="range" min="45" max="100" value="82" />
+                  <span>Calidad <output id="qualityOutput">82%</output></span>
+                  <input id="qualityRange" type="range" min="45" max="100" value="82" />
                 </label>
                 <label class="field">
                   <span>Ancho máximo</span>
-                  <input id="width-input" type="number" min="120" max="8000" step="10" placeholder="Original" />
+                  <input id="widthInput" type="number" min="120" max="8000" step="10" placeholder="Original" />
                 </label>
-                <label class="field threshold-field" hidden>
-                  <span>Sensibilidad <output id="threshold-output">72%</output></span>
-                  <input id="threshold-range" type="range" min="20" max="95" value="72" />
+                <label class="field" id="thresholdField" hidden>
+                  <span>Sensibilidad <output id="thresholdOutput">78%</output></span>
+                  <input id="thresholdRange" type="range" min="35" max="95" value="78" />
                 </label>
               </div>
             </details>
 
-            <button class="primary-action" id="process-button" type="button">
-              <span>Hacerlo ahora</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
-            </button>
-            <p class="status-message" id="status-message" aria-live="polite"></p>
-          </div>
+            <article class="result-card" id="resultCard" hidden>
+              <div class="result-preview"><img id="resultPreview" alt="Resultado procesado" /></div>
+              <div class="result-copy">
+                <div class="result-top">
+                  <span class="ready-label">Resultado listo</span>
+                  <span class="saving-pill" id="savingPill">—</span>
+                </div>
+                <h3 id="resultTitle">Imagen optimizada</h3>
+                <p class="result-meta" id="resultMeta">WebP · 640 KB</p>
+                <div class="result-actions">
+                  <button class="download-button" id="downloadButton" type="button">Descargar resultado</button>
+                  <button class="copy-button" id="copyButton" type="button" aria-label="Copiar imagen">⧉</button>
+                </div>
+              </div>
+            </article>
+            <p class="status" id="status" aria-live="polite"></p>
+          </section>
         </div>
       </div>
-
-      <a class="scroll-cue" href="#herramientas" aria-label="Ver herramientas">
-        <span>Descubre</span>
-        <i></i>
-      </a>
     </section>
 
-    <section class="ticker" aria-label="Características">
-      <div class="ticker-track">
-        <span>Sin registro</span><i>✦</i><span>Procesamiento local</span><i>✦</i><span>Rápido y ligero</span><i>✦</i><span>Tu archivo no sale de tu equipo</span><i>✦</i>
-        <span>Sin registro</span><i>✦</i><span>Procesamiento local</span><i>✦</i><span>Rápido y ligero</span><i>✦</i><span>Tu archivo no sale de tu equipo</span><i>✦</i>
+    <section class="marquee" aria-label="Características">
+      <div class="marquee-track">
+        <span>Sin subir archivos</span><i>✦</i><span>Sin formularios eternos</span><i>✦</i><span>Resultado automático</span><i>✦</i><span>Gratis para empezar</span><i>✦</i>
+        <span>Sin subir archivos</span><i>✦</i><span>Sin formularios eternos</span><i>✦</i><span>Resultado automático</span><i>✦</i><span>Gratis para empezar</span><i>✦</i>
       </div>
     </section>
 
-    <section class="tools-section" id="herramientas" aria-labelledby="tools-title">
-      <div class="section-intro">
-        <p class="eyebrow"><span></span> Lo esencial, bien hecho</p>
-        <h2 id="tools-title">Una página.<br>Cuatro tareas.</h2>
-        <p>Toolisto evita que tengas que abrir cinco sitios distintos para preparar una imagen sencilla.</p>
+    <section class="tools" id="herramientas">
+      <div class="section-head">
+        <p class="eyebrow">Lo esencial, bien resuelto</p>
+        <h2>Cuatro tareas.<br>Un solo lugar.</h2>
+        <p>No tienes que saber qué formato usar ni abrir varias páginas. Toolisto recomienda una opción, la ejecuta y te deja ajustar solo cuando realmente hace falta.</p>
       </div>
 
       <div class="tool-grid">
-        <article class="tool-card tool-card-featured" data-jump-action="optimize">
-          <span class="tool-number">01</span>
-          <div class="tool-symbol compress-symbol" aria-hidden="true"><i></i><i></i><i></i></div>
-          <h3>Comprimir</h3>
-          <p>Reduce el peso manteniendo una calidad visual equilibrada.</p>
-          <button type="button">Usar herramienta <span>↗</span></button>
+        <article class="tool-card" data-open-task="optimize" tabindex="0">
+          <span class="tool-num">01 / COMPRIMIR</span>
+          <div class="tool-art compress-art" aria-hidden="true"><i></i><i></i><i></i></div>
+          <h3>Menos peso</h3>
+          <p>Reduce el tamaño del archivo manteniendo una apariencia limpia y útil.</p>
+          <span class="tool-link">Usar ahora <b>↗</b></span>
         </article>
-
-        <article class="tool-card" data-jump-action="convert">
-          <span class="tool-number">02</span>
-          <div class="tool-symbol convert-symbol" aria-hidden="true"><span>JPG</span><span>WEBP</span></div>
-          <h3>Convertir</h3>
-          <p>Cambia entre JPG, PNG y WebP directamente en el navegador.</p>
-          <button type="button">Usar herramienta <span>↗</span></button>
+        <article class="tool-card" data-open-task="convert" tabindex="0">
+          <span class="tool-num">02 / CONVERTIR</span>
+          <div class="tool-art convert-art" aria-hidden="true"><b>JPG</b><b>WEBP</b></div>
+          <h3>Otro formato</h3>
+          <p>Cambia entre JPG, PNG y WebP sin instalar programas ni crear cuentas.</p>
+          <span class="tool-link">Usar ahora <b>↗</b></span>
         </article>
-
-        <article class="tool-card" data-jump-action="resize">
-          <span class="tool-number">03</span>
-          <div class="tool-symbol resize-symbol" aria-hidden="true"><i></i></div>
-          <h3>Redimensionar</h3>
-          <p>Ajusta el ancho sin deformar ni perder la proporción original.</p>
-          <button type="button">Usar herramienta <span>↗</span></button>
+        <article class="tool-card" data-open-task="resize" tabindex="0">
+          <span class="tool-num">03 / REDIMENSIONAR</span>
+          <div class="tool-art resize-art" aria-hidden="true"><i></i></div>
+          <h3>Tamaño correcto</h3>
+          <p>Ajusta el ancho conservando automáticamente la proporción original.</p>
+          <span class="tool-link">Usar ahora <b>↗</b></span>
         </article>
-
-        <article class="tool-card tool-card-dark" data-jump-action="signature">
-          <span class="tool-number">04</span>
-          <div class="tool-symbol signature-symbol" aria-hidden="true">
-            <svg viewBox="0 0 120 64"><path d="M8 45c12-18 16-30 23-28 11 3-16 35-4 36 9 1 16-31 23-29 8 3-7 24-1 27 6 3 13-20 20-19 6 1-1 15 6 18 8 3 18-8 37-5" /></svg>
-          </div>
-          <h3>Limpiar firma</h3>
-          <p>Quita el fondo claro y deja la firma lista como PNG transparente.</p>
-          <button type="button">Usar herramienta <span>↗</span></button>
+        <article class="tool-card" data-open-task="signature" tabindex="0">
+          <span class="tool-num">04 / FIRMA</span>
+          <div class="tool-art signature-art" aria-hidden="true"><svg viewBox="0 0 130 65"><path d="M8 47c13-20 17-31 24-28 11 4-16 36-3 37 9 1 16-32 24-29 8 3-7 25-1 28 7 3 14-21 21-20 6 1-1 16 7 19 8 3 19-9 41-5" /></svg></div>
+          <h3>Fondo limpio</h3>
+          <p>Convierte una firma sobre papel claro en un PNG con transparencia.</p>
+          <span class="tool-link">Usar ahora <b>↗</b></span>
         </article>
       </div>
     </section>
 
-    <section class="privacy-section" id="privacidad" aria-labelledby="privacy-title">
+    <section class="privacy" id="privacidad">
       <div class="privacy-visual" aria-hidden="true">
-        <div class="privacy-ring ring-one"></div>
-        <div class="privacy-ring ring-two"></div>
-        <div class="privacy-core">
-          <svg viewBox="0 0 48 48"><path d="M15 21v-5a9 9 0 0 1 18 0v5M12 21h24v19H12zM24 29v4" /></svg>
-        </div>
-        <span class="orbit-label label-one">LOCAL</span>
-        <span class="orbit-label label-two">PRIVADO</span>
+        <div class="privacy-ring one"></div>
+        <div class="privacy-ring two"></div>
+        <div class="privacy-core"><svg viewBox="0 0 48 48"><path d="M15 21v-5a9 9 0 0 1 18 0v5M12 21h24v19H12zM24 29v4" /></svg></div>
+        <span class="privacy-tag local">PROCESO LOCAL</span>
+        <span class="privacy-tag zero">CERO SUBIDAS</span>
       </div>
       <div class="privacy-copy">
-        <p class="eyebrow light"><span></span> Privacidad de verdad</p>
-        <h2 id="privacy-title">Tu archivo entra.<br>Tu archivo <em>no sale.</em></h2>
-        <p>Las tareas se ejecutan dentro de tu navegador. Toolisto no necesita cuentas, contraseñas ni una copia de tu imagen en otro servidor.</p>
+        <p class="eyebrow">Privacidad de verdad</p>
+        <h2>Tu imagen entra.<br><em>No sale.</em></h2>
+        <p>La conversión ocurre dentro de tu navegador. Toolisto no necesita guardar una copia, pedirte una cuenta ni enviarla a un servidor.</p>
         <div class="privacy-facts">
           <div><strong>0</strong><span>archivos almacenados</span></div>
-          <div><strong>0</strong><span>cuentas requeridas</span></div>
+          <div><strong>0</strong><span>registros obligatorios</span></div>
         </div>
       </div>
     </section>
 
-    <section class="about-section" id="acerca" aria-labelledby="about-title">
-      <p class="about-kicker">HECHO PARA LA VIDA REAL</p>
-      <h2 id="about-title">No necesitas saber de formatos.<br><span>Solo necesitas terminar.</span></h2>
-      <p>Toolisto detecta lo importante y deja los controles técnicos fuera del camino. Cuando necesites más precisión, están a un clic en “Ajustar detalles”.</p>
-      <a href="#inicio" class="text-link">Probar Toolisto ahora <span>↗</span></a>
+    <section class="closing" id="acerca">
+      <small>HECHO PARA LA VIDA REAL</small>
+      <h2>Menos opciones.<br><span>Más resultados.</span></h2>
+      <p>Toolisto mantiene las decisiones técnicas fuera del camino. Seleccionas una imagen, recibes una recomendación y el resultado aparece automáticamente.</p>
+      <a href="#inicio">Probar Toolisto <span>↗</span></a>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <a class="brand footer-brand" href="#inicio">toolisto<span>.</span></a>
-    <p>Herramientas simples para archivos cotidianos.</p>
-    <div class="footer-links">
-      <a href="#privacidad">Privacidad</a>
-      <a href="#acerca">Acerca</a>
-      <a href="mailto:hola@toolisto.app">Contacto</a>
-    </div>
-    <p class="copyright">© <span id="year"></span> Toolisto</p>
+  <footer class="footer">
+    <a class="brand" href="#inicio"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M6 7h20M16 7v18M9 18l5 5 10-12" /></svg></span><span>toolisto<b>.</b></span></a>
+    <p>Herramientas simples para imágenes cotidianas.</p>
+    <div class="footer-links"><a href="#herramientas">Herramientas</a><a href="#privacidad">Privacidad</a><span>© <b id="year"></b></span></div>
   </footer>
 
-  <canvas id="processing-canvas" hidden></canvas>
-  <script src="app.js"></script>
+  <canvas id="canvas" hidden></canvas>
+  <canvas id="sampleCanvas" hidden></canvas>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const MAX_FILE_SIZE = 25 * 1024 * 1024;
+      const $ = (selector) => document.querySelector(selector);
+      const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+      const state = {
+        file: null,
+        image: null,
+        inputUrl: null,
+        outputBlob: null,
+        outputUrl: null,
+        task: 'optimize',
+        processingToken: 0,
+        suggestedTask: 'optimize',
+      };
+
+      const els = {
+        fileInput: $('#fileInput'),
+        dropZone: $('#dropZone'),
+        editor: $('#editor'),
+        originalPreview: $('#originalPreview'),
+        fileName: $('#fileName'),
+        fileMeta: $('#fileMeta'),
+        resetButton: $('#resetButton'),
+        smartBox: $('#smartBox'),
+        smartTitle: $('#smartTitle'),
+        smartDescription: $('#smartDescription'),
+        formatSelect: $('#formatSelect'),
+        qualityRange: $('#qualityRange'),
+        qualityOutput: $('#qualityOutput'),
+        widthInput: $('#widthInput'),
+        thresholdField: $('#thresholdField'),
+        thresholdRange: $('#thresholdRange'),
+        thresholdOutput: $('#thresholdOutput'),
+        resultCard: $('#resultCard'),
+        resultPreview: $('#resultPreview'),
+        savingPill: $('#savingPill'),
+        resultTitle: $('#resultTitle'),
+        resultMeta: $('#resultMeta'),
+        downloadButton: $('#downloadButton'),
+        copyButton: $('#copyButton'),
+        status: $('#status'),
+        canvas: $('#canvas'),
+        sampleCanvas: $('#sampleCanvas'),
+        toast: $('#toast'),
+      };
+
+      const taskConfig = {
+        optimize: {
+          title: 'Optimizando automáticamente',
+          description: 'Equilibramos peso, formato y calidad sin que tengas que elegir nada.',
+          format: 'image/webp', quality: 82, width: '', result: 'Imagen optimizada', suffix: 'optimizada'
+        },
+        convert: {
+          title: 'Convirtiendo el formato',
+          description: 'Creamos una copia nueva en el formato seleccionado.',
+          format: 'image/png', quality: 92, width: '', result: 'Formato convertido', suffix: 'convertida'
+        },
+        resize: {
+          title: 'Ajustando el tamaño',
+          description: 'Reducimos el ancho y mantenemos la proporción original.',
+          format: 'image/webp', quality: 88, width: 1600, result: 'Imagen redimensionada', suffix: 'redimensionada'
+        },
+        signature: {
+          title: 'Limpiando la firma',
+          description: 'Quitamos el fondo claro y generamos un PNG transparente.',
+          format: 'image/png', quality: 100, width: '', result: 'Firma limpia', suffix: 'firma-limpia'
+        }
+      };
+
+      function formatBytes(bytes) {
+        if (!Number.isFinite(bytes)) return '—';
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
+      }
+
+      function safeName(name) {
+        return name.replace(/\.[^/.]+$/, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'toolisto';
+      }
+
+      function extensionFor(mime) {
+        return ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' })[mime] || 'png';
+      }
+
+      function mimeLabel(mime) {
+        return ({ 'image/jpeg': 'JPG', 'image/png': 'PNG', 'image/webp': 'WebP' })[mime] || 'Imagen';
+      }
+
+      function showToast(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add('show');
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => els.toast.classList.remove('show'), 2400);
+      }
+
+      function setStatus(message, error = false) {
+        els.status.textContent = message;
+        els.status.style.color = error ? '#b23a2c' : 'rgba(16,24,38,.62)';
+      }
+
+      function clearOutput() {
+        if (state.outputUrl) URL.revokeObjectURL(state.outputUrl);
+        state.outputBlob = null;
+        state.outputUrl = null;
+        els.resultPreview.removeAttribute('src');
+        els.resultCard.hidden = true;
+      }
+
+      function reset() {
+        state.processingToken += 1;
+        if (state.inputUrl) URL.revokeObjectURL(state.inputUrl);
+        clearOutput();
+        state.file = null;
+        state.image = null;
+        state.inputUrl = null;
+        els.fileInput.value = '';
+        els.originalPreview.removeAttribute('src');
+        els.editor.hidden = true;
+        els.dropZone.hidden = false;
+        setStatus('');
+      }
+
+      async function loadImage(file) {
+        const url = URL.createObjectURL(file);
+        const image = new Image();
+        image.decoding = 'async';
+        try {
+          await new Promise((resolve, reject) => {
+            image.onload = resolve;
+            image.onerror = () => reject(new Error('No se pudo leer esta imagen.'));
+            image.src = url;
+          });
+          return { image, url };
+        } catch (error) {
+          URL.revokeObjectURL(url);
+          throw error;
+        }
+      }
+
+      function analyzeImage(image, file) {
+        const canvas = els.sampleCanvas;
+        const width = 72;
+        const height = Math.max(1, Math.round(width * image.naturalHeight / image.naturalWidth));
+        canvas.width = width;
+        canvas.height = Math.min(height, 72);
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let white = 0;
+        let dark = 0;
+        let transparent = 0;
+        const pixels = data.length / 4;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const alpha = data[i + 3];
+          if (alpha < 245) transparent += 1;
+          const luminance = .2126 * data[i] + .7152 * data[i + 1] + .0722 * data[i + 2];
+          if (luminance > 236 && alpha > 230) white += 1;
+          if (luminance < 125 && alpha > 120) dark += 1;
+        }
+
+        const fileName = file.name.toLowerCase();
+        const namedSignature = /(firma|signature|sign|rubrica|rúbrica)/.test(fileName);
+        const looksLikeSignature = white / pixels > .72 && dark / pixels > .003 && dark / pixels < .19 && image.naturalWidth / image.naturalHeight > 1.25;
+        const hasTransparency = transparent / pixels > .015;
+
+        if (namedSignature || looksLikeSignature) return { task: 'signature', hasTransparency };
+        if (image.naturalWidth > 2400 || image.naturalHeight > 2400) return { task: 'resize', hasTransparency };
+        return { task: 'optimize', hasTransparency };
+      }
+
+      function applyTask(task, preserve = false) {
+        if (!taskConfig[task]) return;
+        state.task = task;
+        const config = taskConfig[task];
+        $$('.task-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.task === task));
+        els.smartTitle.textContent = config.title;
+        els.smartDescription.textContent = config.description;
+        els.thresholdField.hidden = task !== 'signature';
+
+        if (!preserve) {
+          els.formatSelect.value = config.format;
+          els.qualityRange.value = config.quality;
+          els.qualityOutput.textContent = `${config.quality}%`;
+          els.widthInput.value = config.width;
+        }
+
+        if (task === 'signature') {
+          els.formatSelect.value = 'image/png';
+          els.formatSelect.disabled = true;
+          els.qualityRange.disabled = true;
+        } else {
+          els.formatSelect.disabled = false;
+          els.qualityRange.disabled = false;
+        }
+
+        if (state.image) scheduleProcess(60);
+      }
+
+      async function handleFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          showToast('Selecciona una imagen JPG, PNG, WebP, GIF o SVG.');
+          return;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+          showToast('La imagen supera el límite de 25 MB.');
+          return;
+        }
+
+        try {
+          setStatus('Leyendo imagen…');
+          const { image, url } = await loadImage(file);
+          if (state.inputUrl) URL.revokeObjectURL(state.inputUrl);
+          clearOutput();
+          state.file = file;
+          state.image = image;
+          state.inputUrl = url;
+          els.originalPreview.src = url;
+          els.fileName.textContent = file.name;
+          els.fileMeta.textContent = `${image.naturalWidth} × ${image.naturalHeight} · ${formatBytes(file.size)}`;
+          els.dropZone.hidden = true;
+          els.editor.hidden = false;
+
+          const analysis = analyzeImage(image, file);
+          state.suggestedTask = analysis.task;
+          applyTask(analysis.task);
+          setStatus('Toolisto detectó la mejor opción y está preparando el resultado.');
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message || 'No se pudo abrir la imagen.', true);
+          showToast(error.message || 'No se pudo abrir la imagen.');
+        }
+      }
+
+      function outputSize() {
+        const requested = Number.parseInt(els.widthInput.value, 10);
+        const originalWidth = state.image.naturalWidth;
+        const originalHeight = state.image.naturalHeight;
+        if (!requested || requested >= originalWidth) return { width: originalWidth, height: originalHeight };
+        const ratio = requested / originalWidth;
+        return { width: requested, height: Math.max(1, Math.round(originalHeight * ratio)) };
+      }
+
+      function cleanSignature(ctx, width, height) {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        const threshold = Number(els.thresholdRange.value) / 100;
+        const cutoff = 255 * threshold;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const luminance = .2126 * r + .7152 * g + .0722 * b;
+          const darkness = Math.max(0, Math.min(1, (cutoff - luminance) / Math.max(cutoff * .72, 1)));
+          data[i] = 15;
+          data[i + 1] = 23;
+          data[i + 2] = 38;
+          data[i + 3] = Math.round(255 * Math.pow(darkness, .72));
+        }
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+      function canvasToBlob(canvas, mime, quality) {
+        return new Promise((resolve, reject) => {
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('El navegador no pudo generar el resultado.')), mime, quality);
+        });
+      }
+
+      async function processImage(token) {
+        if (!state.file || !state.image) return;
+        els.smartBox.classList.add('processing');
+        els.resultCard.hidden = true;
+        setStatus('Procesando automáticamente…');
+
+        try {
+          const { width, height } = outputSize();
+          if (width * height > 52_000_000) throw new Error('La imagen es demasiado grande para procesarla en este navegador.');
+
+          const canvas = els.canvas;
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d', { willReadFrequently: state.task === 'signature' });
+          ctx.clearRect(0, 0, width, height);
+
+          let mime = els.formatSelect.value;
+          let quality = Number(els.qualityRange.value) / 100;
+          if (mime === 'image/jpeg' && state.task !== 'signature') {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+          }
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(state.image, 0, 0, width, height);
+
+          if (state.task === 'signature') {
+            cleanSignature(ctx, width, height);
+            mime = 'image/png';
+            quality = 1;
+          }
+
+          const blob = await canvasToBlob(canvas, mime, quality);
+          if (token !== state.processingToken) return;
+          clearOutput();
+          state.outputBlob = blob;
+          state.outputUrl = URL.createObjectURL(blob);
+          els.resultPreview.src = state.outputUrl;
+
+          const difference = state.file.size - blob.size;
+          const percent = state.file.size ? Math.round(Math.abs(difference) / state.file.size * 100) : 0;
+          els.savingPill.textContent = difference > 0 ? `${percent}% menos` : difference < 0 ? `${percent}% más` : 'Mismo peso';
+          els.resultTitle.textContent = taskConfig[state.task].result;
+          els.resultMeta.textContent = `${mimeLabel(mime)} · ${width} × ${height} · ${formatBytes(blob.size)}`;
+          els.resultCard.hidden = false;
+          setStatus('Listo. Cambia una opción y el resultado se actualizará solo.');
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message || 'No se pudo procesar la imagen.', true);
+          showToast(error.message || 'No se pudo procesar la imagen.');
+        } finally {
+          if (token === state.processingToken) els.smartBox.classList.remove('processing');
+        }
+      }
+
+      function scheduleProcess(delay = 240) {
+        if (!state.image) return;
+        state.processingToken += 1;
+        const token = state.processingToken;
+        clearTimeout(scheduleProcess.timer);
+        scheduleProcess.timer = setTimeout(() => processImage(token), delay);
+      }
+
+      function downloadResult() {
+        if (!state.outputBlob || !state.outputUrl) return;
+        const mime = state.task === 'signature' ? 'image/png' : els.formatSelect.value;
+        const link = document.createElement('a');
+        link.href = state.outputUrl;
+        link.download = `${safeName(state.file.name)}-${taskConfig[state.task].suffix}.${extensionFor(mime)}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        showToast('Descarga iniciada.');
+      }
+
+      async function copyResult() {
+        if (!state.outputBlob) return;
+        if (!navigator.clipboard || !window.ClipboardItem) {
+          showToast('Tu navegador no permite copiar imágenes. Usa Descargar.');
+          return;
+        }
+        try {
+          let blob = state.outputBlob;
+          if (blob.type !== 'image/png') {
+            blob = await canvasToBlob(els.canvas, 'image/png', 1);
+          }
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          showToast('Imagen copiada.');
+        } catch (error) {
+          console.error(error);
+          showToast('No se pudo copiar. Usa Descargar.');
+        }
+      }
+
+      $('#chooseFile').addEventListener('click', event => { event.stopPropagation(); els.fileInput.click(); });
+      els.dropZone.addEventListener('click', () => els.fileInput.click());
+      els.dropZone.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); els.fileInput.click(); }
+      });
+      els.fileInput.addEventListener('change', () => handleFile(els.fileInput.files[0]));
+      els.resetButton.addEventListener('click', reset);
+
+      ['dragenter','dragover'].forEach(name => els.dropZone.addEventListener(name, event => {
+        event.preventDefault();
+        els.dropZone.classList.add('dragging');
+      }));
+      ['dragleave','drop'].forEach(name => els.dropZone.addEventListener(name, event => {
+        event.preventDefault();
+        els.dropZone.classList.remove('dragging');
+      }));
+      els.dropZone.addEventListener('drop', event => handleFile(event.dataTransfer.files[0]));
+
+      document.addEventListener('paste', event => {
+        const file = [...(event.clipboardData?.files || [])].find(item => item.type.startsWith('image/'));
+        if (file) handleFile(file);
+      });
+
+      $$('.task-tab').forEach(tab => tab.addEventListener('click', () => applyTask(tab.dataset.task)));
+      els.formatSelect.addEventListener('change', () => scheduleProcess());
+      els.qualityRange.addEventListener('input', () => { els.qualityOutput.textContent = `${els.qualityRange.value}%`; scheduleProcess(); });
+      els.widthInput.addEventListener('input', () => scheduleProcess());
+      els.thresholdRange.addEventListener('input', () => { els.thresholdOutput.textContent = `${els.thresholdRange.value}%`; scheduleProcess(); });
+      els.downloadButton.addEventListener('click', downloadResult);
+      els.copyButton.addEventListener('click', copyResult);
+
+      $$('.tool-card').forEach(card => {
+        const openTool = () => {
+          const task = card.dataset.openTask;
+          document.querySelector('#inicio').scrollIntoView({ behavior: 'smooth' });
+          if (state.file) applyTask(task);
+          else {
+            state.suggestedTask = task;
+            setTimeout(() => els.fileInput.click(), 450);
+          }
+        };
+        card.addEventListener('click', openTool);
+        card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openTool(); } });
+      });
+
+      window.addEventListener('beforeunload', () => {
+        if (state.inputUrl) URL.revokeObjectURL(state.inputUrl);
+        if (state.outputUrl) URL.revokeObjectURL(state.outputUrl);
+      });
+
+      $('#year').textContent = new Date().getFullYear();
+    })();
+  </script>
 </body>
 </html>
